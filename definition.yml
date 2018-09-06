@@ -1,5 +1,6 @@
 id: forks
 docker_repository: dynverse/ti_forks
+singularity_collection: 1548
 container_url: https://github.com/dynverse/ti_forks
 name: FORKS
 type: algorithm
