@@ -1,3 +1,10 @@
+#!/usr/local/bin/python
+
+# this wrapper script is based on the scripts available at the forks repo
+
+import dynclipy
+task = dynclipy.main()
+
 import matplotlib
 matplotlib.use('Agg')
 
@@ -28,9 +35,8 @@ checkpoints = {}
 
 #   ____________________________________________________________________________
 #   Load data                                                               ####
-counts = pd.read_csv("/ti/input/counts.csv", index_col=[0])
-p = json.load(open("/ti/input/params.json", "r"))
-
+counts = task["counts"]
+p = task["params"]
 
 gene_name = counts.columns
 cell_names = counts.index
@@ -61,7 +67,7 @@ red_dim=inds[0][0]
 mappedData=mappedData[0:,0:red_dim]
 
 #%%find number of clusters
-range_clusters=range(p["min_cluster"],p["max_cluster"],1)
+range_clusters=range(int(p["cluster"][0]),int(p["cluster"][1]),1)
 n_clus,max_sil,sil_scores=find_nclusters(mappedData,range_clusters)
 M=range_clusters[n_clus]
 
@@ -144,30 +150,27 @@ all_paths_steiner,longest_path_steiner=searchlongestpath(end_idxs_steiner,MST_di
 ordering_steiner=pseudotemporalordering(X_reduced,cluster_centers_steiner,MST_dict_steiner,all_paths_steiner,longest_path_steiner,MST_orig_steiner,cluster_labels_steiner)
 #find spearman correlation with actual labels
 
-
 checkpoints["method_aftermethod"] = time()
 
 #   ____________________________________________________________________________
 #   Process output & save                                                   ####
 # pseudotime
 
-cell_ids = pd.DataFrame({
-  "cell_ids": cell_names1
+output = dynclipy.wrap_data(cell_ids = cell_names1)
+pseudotime = pd.DataFrame({
+  "pseudotime": ordering_steiner,
+  "cell_id": cell_names1
 })
-cell_ids.to_csv("/ti/output/cell_ids.csv", index=False)
+output.add_linear_trajectory(pseudotime = pseudotime)
 
 dimred = pd.DataFrame(
   X_reduced,
   index = cell_names1
 )
 dimred.index.name = "cell_id"
-dimred.to_csv("/ti/output/dimred.csv", index=True)
+dimred = dimred.reset_index()
+output.add_dimred(dimred)
 
-pseudotime = pd.DataFrame({
-  "pseudotime": ordering_steiner,
-  "cell_id": cell_names1
-})
-pseudotime.to_csv("/ti/output/pseudotime.csv", index=False)
+output.add_timings(checkpoints)
 
-# timings
-json.dump(checkpoints, open("/ti/output/timings.json", "w"))
+output.write_output(task["output"])
