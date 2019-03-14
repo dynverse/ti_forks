@@ -4,6 +4,6 @@ RUN pip install seaborn hdbscan
 
 RUN git clone https://github.com/macsharma/FORKS.git
 
-COPY  definition.yml run.py example.sh /code/
+COPY definition.yml run.py example.sh /code/
 
 ENTRYPOINT ["/code/run.py"]
