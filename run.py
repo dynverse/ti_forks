@@ -36,7 +36,7 @@ checkpoints = {}
 #   ____________________________________________________________________________
 #   Load data                                                               ####
 counts = task["counts"]
-p = task["params"]
+p = task["parameters"]
 
 gene_name = counts.columns
 cell_names = counts.index
@@ -83,12 +83,12 @@ data2=data1
 n_components=red_dim
 isplot=False
 gene_preprocessing_type='none'
-mapping_params={}
-mapping_params['mapping_type']=p["mapping_type"]
-mapping_params['n_neighbors']=n_neighbors
-mapping_params['n_components']=n_components
-mapping_params['isplot']=isplot
-mapping_params['gene_preprocessing_type']=gene_preprocessing_type
+mapping_parameters={}
+mapping_parameters['mapping_type']=p["mapping_type"]
+mapping_parameters['n_neighbors']=n_neighbors
+mapping_parameters['n_components']=n_components
+mapping_parameters['isplot']=isplot
+mapping_parameters['gene_preprocessing_type']=gene_preprocessing_type
 
 actual_time2=data2[:,0]
 
@@ -99,17 +99,17 @@ if(p["mapping_type"]=='tSNE'):
         pca.fit(data2)
         mappedData=pca.fit_transform(data2)
         mappedData=mappedData[0:,0:50]
-        X_reduced=mapping(mappedData,actual_time2,mapping_params)
+        X_reduced=mapping(mappedData,actual_time2,mapping_parameters)
     elif(data2.shape[1]>2*red_dim and red_dim>50):
         pca = PCA()
         pca.fit(data2)
         mappedData=pca.fit_transform(data2)
         mappedData=mappedData[0:,0:2*red_dim]
-        X_reduced=mapping(mappedData,actual_time2,mapping_params)
+        X_reduced=mapping(mappedData,actual_time2,mapping_parameters)
     else:
-        X_reduced=mapping(data2,actual_time2,mapping_params)
+        X_reduced=mapping(data2,actual_time2,mapping_parameters)
 else:
-    X_reduced=mapping(data2,actual_time2,mapping_params)
+    X_reduced=mapping(data2,actual_time2,mapping_parameters)
 
 print ('2 %d,%d'%X_reduced.shape)
 ##############################################################################
